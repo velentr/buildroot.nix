@@ -8,8 +8,14 @@
     src = src;
 
     buildInputs = with pkgs; [
+      bc
+      cpio
+      file
       perl
+      rsync
       unzip
+      util-linux
+      wget # Not actually used, but still needs to be installed
       which
     ];
 
