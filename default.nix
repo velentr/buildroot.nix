@@ -4,7 +4,7 @@
   defconfig,
 }: let
   inherit (pkgs) stdenv;
-in {
+in rec {
   packageInfo = stdenv.mkDerivation {
     name = "${defconfig}-packageinfo.json";
     src = src;
@@ -30,5 +30,18 @@ in {
     installPhase = ''
       cp packageinfo.json $out
     '';
+  };
+
+  packageLockFile = stdenv.mkDerivation {
+    name = "${defconfig}-packages.lock";
+    src = src;
+
+    buildInputs = with pkgs; [python3];
+
+    dontConfigure = true;
+    buildPhase = ''
+      python3 ${./make-package-lock.py} --input ${packageInfo} --output $out
+    '';
+    dontInstall = true;
   };
 }
