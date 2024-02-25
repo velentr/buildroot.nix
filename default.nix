@@ -4,9 +4,7 @@
   defconfig,
 }: let
   inherit (pkgs) stdenv;
-in rec {
-  packageInfo = stdenv.mkDerivation {
-    name = "${defconfig}-packageinfo.json";
+  buildrootBase = {
     src = src;
 
     buildInputs = with pkgs; [
@@ -22,15 +20,20 @@ in rec {
     configurePhase = ''
       make ${defconfig}
     '';
-
-    buildPhase = ''
-      make show-info > packageinfo.json
-    '';
-
-    installPhase = ''
-      cp packageinfo.json $out
-    '';
   };
+in rec {
+  packageInfo = stdenv.mkDerivation (buildrootBase
+    // {
+      name = "${defconfig}-packageinfo.json";
+
+      buildPhase = ''
+        make show-info > packageinfo.json
+      '';
+
+      installPhase = ''
+        cp packageinfo.json $out
+      '';
+    });
 
   packageLockFile = stdenv.mkDerivation {
     name = "${defconfig}-packages.lock";
