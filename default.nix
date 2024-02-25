@@ -44,4 +44,25 @@ in rec {
     '';
     dontInstall = true;
   };
+
+  packageInputs = {lockfile}: let
+    lockedInputs = builtins.fromJSON (builtins.readFile lockfile);
+    symlinkCommands = builtins.map (
+      file: let
+        lockedAttrs = lockedInputs.${file};
+        input = pkgs.fetchurl {
+          name = file;
+          urls = lockedInputs.${file}.uris;
+          hash = "${lockedAttrs.algo}:${lockedAttrs.checksum}";
+        };
+      in "ln -s ${input} $out/${file}"
+    ) (builtins.attrNames lockedInputs);
+  in
+    stdenv.mkDerivation {
+      name = "${defconfig}-sources";
+      dontUnpack = true;
+      dontConfigure = true;
+      buildPhase = "mkdir $out";
+      installPhase = pkgs.lib.strings.concatStringsSep "\n" symlinkCommands;
+    };
 }
