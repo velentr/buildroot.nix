@@ -7,7 +7,7 @@
   buildrootBase = {
     src = src;
 
-    buildInputs = with pkgs; [
+    nativeBuildInputs = with pkgs; [
       bc
       cpio
       file
