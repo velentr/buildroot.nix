@@ -14,11 +14,17 @@
     supportedSystems = ["x86_64-linux"];
     forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
     pkgs = forAllSystems (system: nixpkgs.legacyPackages.${system});
-    treefmtEval = forAllSystems (system: treefmt-nix.lib.evalModule pkgs.${system} ./treefmt.nix);
+    treefmtEval = forAllSystems (
+      system:
+        treefmt-nix.lib.evalModule pkgs.${system} ./treefmt.nix
+    );
   in {
     lib.mkBuildroot = args: import ./default.nix args;
 
-    formatter = forAllSystems (system: treefmtEval.${system}.config.build.wrapper);
+    formatter = forAllSystems (
+      system:
+        treefmtEval.${system}.config.build.wrapper
+    );
     checks = forAllSystems (system: {
       formatting = treefmtEval.${system}.config.build.check self;
     });
