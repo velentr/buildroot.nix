@@ -20,7 +20,7 @@
     ];
 
     patchPhase = ''
-      sed -i "s%/usr/bin/env%$(which env)%" support/scripts/br2-external
+      patchShebangs support/scripts support/download
     '';
 
     configurePhase = ''
