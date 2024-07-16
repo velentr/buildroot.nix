@@ -4,27 +4,32 @@
   defconfig,
 }: let
   inherit (pkgs) stdenv;
+  # There are too many places that hardcode /bin or /usr/bin to patch them all
+  # (some of them are in unpacked tarballs and aren't revealed until individual
+  # packages are enabled). Instead, just build everything in a FHS
+  # environment. This has the added bonus of making it less likely for build
+  # artifacts to hardcode a path to the nix store.
+  makeFHSEnv = pkgs.buildFHSEnv {
+    name = "make-with-fhs-env";
+    targetPkgs = pkgs:
+      with pkgs; [
+        bc
+        cpio
+        file
+        perl
+        rsync
+        unzip
+        util-linux
+        wget # Not actually used, but still needs to be installed
+        which
+      ];
+    runScript = "make";
+  };
   buildrootBase = {
     src = src;
 
-    nativeBuildInputs = with pkgs; [
-      bc
-      cpio
-      file
-      perl
-      rsync
-      unzip
-      util-linux
-      wget # Not actually used, but still needs to be installed
-      which
-    ];
-
-    patchPhase = ''
-      patchShebangs support/scripts support/download
-    '';
-
     configurePhase = ''
-      make ${defconfig}
+      ${makeFHSEnv}/bin/make-with-fhs-env ${defconfig}
     '';
   };
 in rec {
@@ -33,7 +38,7 @@ in rec {
       name = "${defconfig}-packageinfo.json";
 
       buildPhase = ''
-        make show-info > packageinfo.json
+        ${makeFHSEnv}/bin/make-with-fhs-env show-info > packageinfo.json
       '';
 
       installPhase = ''
