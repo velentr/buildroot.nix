@@ -28,6 +28,11 @@
   buildrootBase = {
     src = src;
 
+    patchPhase = ''
+      sed -i 's%--disable-makeinstall-chown%--disable-makeinstall-chown --disable-makeinstall-setuid%' \
+          package/util-linux/util-linux.mk
+    '';
+
     configurePhase = ''
       ${makeFHSEnv}/bin/make-with-fhs-env ${defconfig}
     '';
