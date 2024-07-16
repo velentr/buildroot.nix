@@ -36,6 +36,8 @@
     configurePhase = ''
       ${makeFHSEnv}/bin/make-with-fhs-env ${defconfig}
     '';
+
+    hardeningDisable = ["format"];
   };
 in rec {
   packageInfo = stdenv.mkDerivation (buildrootBase
