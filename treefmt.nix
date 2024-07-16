@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2024 Brian Kubisiak <brian@kubisiak.com>
+#
+# SPDX-License-Identifier: MIT
 {pkgs, ...}: {
   projectRootFile = ".git/config";
 

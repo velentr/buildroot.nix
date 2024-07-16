@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024 Brian Kubisiak <brian@kubisiak.com>
+#
+# SPDX-License-Identifier: MIT
+
 """Create a buildroot package lock file based on the given package inputs."""
 
 import argparse
