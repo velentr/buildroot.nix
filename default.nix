@@ -89,4 +89,29 @@ in rec {
       buildPhase = "mkdir $out";
       installPhase = pkgs.lib.strings.concatStringsSep "\n" symlinkCommands;
     };
+
+  buildroot = {lockfile}: let
+    lockedPackageInputs = packageInputs {lockfile = lockfile;};
+  in
+    stdenv.mkDerivation (buildrootBase
+      // {
+        name = "buildroot-${defconfig}";
+
+        buildPhase = ''
+          export BR2_DL_DIR=/build/source/downloads
+          mkdir $BR2_DL_DIR
+          for lockedInput in ${lockedPackageInputs}/*; do
+              ln -s $lockedInput $BR2_DL_DIR/$(basename $lockedInput)
+          done
+
+          ${makeFHSEnv}/bin/make-with-fhs-env
+        '';
+
+        installPhase = ''
+          mkdir $out
+          cp -r output/images $out/
+        '';
+
+        dontFixup = true;
+      });
 }
