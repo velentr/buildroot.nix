@@ -48,6 +48,7 @@ Add the following `flake.nix` to the root of your buildroot repo:
   in {
     packages = forAllSystems (system: let
       buildrootPackages = buildroot-nix.lib.mkBuildroot {
+        name = "my-buildroot";
         pkgs = nixpkgs.legacyPackages.${system};
         defconfig = "qemu_aarch64_virt_defconfig";
         src = self;

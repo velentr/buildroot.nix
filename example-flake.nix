@@ -14,6 +14,7 @@
   in {
     packages = forAllSystems (system: let
       buildrootPackages = buildroot-nix.lib.mkBuildroot {
+        name = "my-buildroot";
         pkgs = nixpkgs.legacyPackages.${system};
         # Replace this with your defconfig, or call mkBuildroot
         # multiple times if you have several.

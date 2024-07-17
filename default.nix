@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 {
+  name,
   pkgs ? import <nixpkgs> {},
   src,
   defconfig,
@@ -45,7 +46,7 @@
 in rec {
   packageInfo = stdenv.mkDerivation (buildrootBase
     // {
-      name = "${defconfig}-packageinfo.json";
+      name = "${name}-packageinfo.json";
 
       buildPhase = ''
         ${makeFHSEnv}/bin/make-with-fhs-env show-info > packageinfo.json
@@ -57,7 +58,7 @@ in rec {
     });
 
   packageLockFile = stdenv.mkDerivation {
-    name = "${defconfig}-packages.lock";
+    name = "${name}-packages.lock";
     src = src;
 
     buildInputs = with pkgs; [python3];
@@ -83,7 +84,7 @@ in rec {
     ) (builtins.attrNames lockedInputs);
   in
     stdenv.mkDerivation {
-      name = "${defconfig}-sources";
+      name = "${name}-sources";
       dontUnpack = true;
       dontConfigure = true;
       buildPhase = "mkdir $out";
@@ -95,7 +96,7 @@ in rec {
   in
     stdenv.mkDerivation (buildrootBase
       // {
-        name = "buildroot-${defconfig}";
+        name = name;
 
         buildPhase = ''
           export BR2_DL_DIR=/build/source/downloads
