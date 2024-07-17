@@ -6,6 +6,7 @@
   pkgs ? import <nixpkgs> {},
   src,
   defconfig,
+  nativeBuildInputs ? [],
 }: let
   inherit (pkgs) stdenv;
   # There are too many places that hardcode /bin or /usr/bin to patch them all
@@ -16,17 +17,19 @@
   makeFHSEnv = pkgs.buildFHSEnv {
     name = "make-with-fhs-env";
     targetPkgs = pkgs:
-      with pkgs; [
-        bc
-        cpio
-        file
-        perl
-        rsync
-        unzip
-        util-linux
-        wget # Not actually used, but still needs to be installed
-        which
-      ];
+      with pkgs;
+        [
+          bc
+          cpio
+          file
+          perl
+          rsync
+          unzip
+          util-linux
+          wget # Not actually used, but still needs to be installed
+          which
+        ]
+        ++ nativeBuildInputs;
     runScript = "make";
   };
   buildrootBase = {
