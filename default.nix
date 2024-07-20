@@ -83,7 +83,7 @@ in rec {
           urls = lockedInputs.${file}.uris;
           hash = "${lockedAttrs.algo}:${lockedAttrs.checksum}";
         };
-      in "ln -s ${input} $out/${file}"
+      in "ln -s ${input} $out/'${file}'"
     ) (builtins.attrNames lockedInputs);
   in
     stdenv.mkDerivation {
@@ -105,7 +105,7 @@ in rec {
           export BR2_DL_DIR=/build/source/downloads
           mkdir $BR2_DL_DIR
           for lockedInput in ${lockedPackageInputs}/*; do
-              ln -s $lockedInput $BR2_DL_DIR/$(basename $lockedInput)
+              ln -s $lockedInput "$BR2_DL_DIR/$(basename $lockedInput)"
           done
 
           ${makeFHSEnv}/bin/make-with-fhs-env
