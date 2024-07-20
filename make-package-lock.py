@@ -19,6 +19,11 @@ class DownloadInfo:
     checksum: str
 
 
+def is_http_download(uri: str) -> bool:
+    # Note that this should handle both http and https with or without '|urlencode'.
+    return uri.split("+", maxsplit=1)[0].startswith("http")
+
+
 def create_download_info(
     checksums_index: T.Dict[str, DownloadInfo], package_info: T.Dict
 ) -> T.Dict:
@@ -30,6 +35,7 @@ def create_download_info(
             uris = [
                 uri.split("+", maxsplit=1)[-1] + "/" + source
                 for uri in download["uris"]
+                if is_http_download(uri)
             ]
             download_info = checksums_index[source]
             result[source] = dict(
