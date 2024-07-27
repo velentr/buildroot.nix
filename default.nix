@@ -6,6 +6,7 @@
   pkgs ? import <nixpkgs> {},
   src,
   defconfig,
+  lockfile,
   nativeBuildInputs ? [],
 }: let
   inherit (pkgs) stdenv;
@@ -46,6 +47,26 @@
 
     hardeningDisable = ["format"];
   };
+  lockedPackageInputs = let
+    lockedInputs = builtins.fromJSON (builtins.readFile lockfile);
+    symlinkCommands = builtins.map (
+      file: let
+        lockedAttrs = lockedInputs.${file};
+        input = pkgs.fetchurl {
+          name = file;
+          urls = lockedInputs.${file}.uris;
+          hash = "${lockedAttrs.algo}:${lockedAttrs.checksum}";
+        };
+      in "ln -s ${input} $out/'${file}'"
+    ) (builtins.attrNames lockedInputs);
+  in
+    stdenv.mkDerivation {
+      name = "${name}-sources";
+      dontUnpack = true;
+      dontConfigure = true;
+      buildPhase = "mkdir $out";
+      installPhase = pkgs.lib.strings.concatStringsSep "\n" symlinkCommands;
+    };
 in rec {
   packageInfo = stdenv.mkDerivation (buildrootBase
     // {
@@ -73,49 +94,27 @@ in rec {
     dontInstall = true;
   };
 
-  packageInputs = {lockfile}: let
-    lockedInputs = builtins.fromJSON (builtins.readFile lockfile);
-    symlinkCommands = builtins.map (
-      file: let
-        lockedAttrs = lockedInputs.${file};
-        input = pkgs.fetchurl {
-          name = file;
-          urls = lockedInputs.${file}.uris;
-          hash = "${lockedAttrs.algo}:${lockedAttrs.checksum}";
-        };
-      in "ln -s ${input} $out/'${file}'"
-    ) (builtins.attrNames lockedInputs);
-  in
-    stdenv.mkDerivation {
-      name = "${name}-sources";
-      dontUnpack = true;
-      dontConfigure = true;
-      buildPhase = "mkdir $out";
-      installPhase = pkgs.lib.strings.concatStringsSep "\n" symlinkCommands;
-    };
+  packageInputs = lockedPackageInputs;
 
-  buildroot = {lockfile}: let
-    lockedPackageInputs = packageInputs {lockfile = lockfile;};
-  in
-    stdenv.mkDerivation (buildrootBase
-      // {
-        name = name;
+  buildroot = stdenv.mkDerivation (buildrootBase
+    // {
+      name = name;
 
-        buildPhase = ''
-          export BR2_DL_DIR=/build/source/downloads
-          mkdir $BR2_DL_DIR
-          for lockedInput in ${lockedPackageInputs}/*; do
-              ln -s $lockedInput "$BR2_DL_DIR/$(basename $lockedInput)"
-          done
+      buildPhase = ''
+        export BR2_DL_DIR=/build/source/downloads
+        mkdir $BR2_DL_DIR
+        for lockedInput in ${lockedPackageInputs}/*; do
+            ln -s $lockedInput "$BR2_DL_DIR/$(basename $lockedInput)"
+        done
 
-          ${makeFHSEnv}/bin/make-with-fhs-env
-        '';
+        ${makeFHSEnv}/bin/make-with-fhs-env
+      '';
 
-        installPhase = ''
-          mkdir $out
-          cp -r output/images $out/
-        '';
+      installPhase = ''
+        mkdir $out
+        cp -r output/images $out/
+      '';
 
-        dontFixup = true;
-      });
+      dontFixup = true;
+    });
 }
