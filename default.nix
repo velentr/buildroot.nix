@@ -100,6 +100,8 @@ in rec {
     // {
       name = name;
 
+      outputs = ["out" "sdk"];
+
       buildPhase = ''
         export BR2_DL_DIR=/build/source/downloads
         mkdir $BR2_DL_DIR
@@ -108,11 +110,14 @@ in rec {
         done
 
         ${makeFHSEnv}/bin/make-with-fhs-env
+        ${makeFHSEnv}/bin/make-with-fhs-env sdk
       '';
 
       installPhase = ''
-        mkdir $out
+        mkdir $out $sdk
         cp -r output/images $out/
+        cp -r output/host $sdk
+        sh $sdk/host/relocate-sdk.sh
       '';
 
       dontFixup = true;
