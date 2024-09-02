@@ -104,7 +104,7 @@ in rec {
 
       buildPhase = ''
         export BR2_DL_DIR=/build/source/downloads
-        mkdir $BR2_DL_DIR
+        mkdir -p $BR2_DL_DIR
         for lockedInput in ${lockedPackageInputs}/*; do
             ln -s $lockedInput "$BR2_DL_DIR/$(basename $lockedInput)"
         done
