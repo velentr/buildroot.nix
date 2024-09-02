@@ -19,6 +19,9 @@
         # Replace this with your defconfig, or call mkBuildroot
         # multiple times if you have several.
         defconfig = "qemu_aarch64_virt_defconfig";
+        # Note that the lockfile is evaluated lazily so it can be
+        # added as an argument here before it exists.
+        lockfile = ./buildroot.lock;
         # If the flake is not in the root of the repo, change this to
         # point at the sources instead. This could also be changed to
         # a tarball or git repository to download the sources as part
@@ -37,7 +40,7 @@
       # full buildroot and must be kept up-to-date as packages are
       # added.
       lockfile = buildrootPackages.packageLockFile;
-      default = buildrootPackages.buildroot {lockfile = ./buildroot.lock;};
+      default = buildrootPackages.buildroot;
     });
   };
 }

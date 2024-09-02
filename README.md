@@ -51,11 +51,12 @@ Add the following `flake.nix` to the root of your buildroot repo:
         name = "my-buildroot";
         pkgs = nixpkgs.legacyPackages.${system};
         defconfig = "qemu_aarch64_virt_defconfig";
+        lockfile = ./buildroot.lock;
         src = self;
       };
     in {
       lockfile = buildrootPackages.packageLockFile;
-      default = buildrootPackages.buildroot {lockfile = ./buildroot.lock;};
+      default = buildrootPackages.buildroot;
     });
   };
 }
