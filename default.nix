@@ -116,8 +116,8 @@ in rec {
       installPhase = ''
         mkdir $out $sdk
         cp -r output/images $out/
-        cp -r output/host $sdk
-        sh $sdk/host/relocate-sdk.sh
+        cp -r output/host/* $sdk
+        sh $sdk/relocate-sdk.sh
       '';
 
       dontFixup = true;
