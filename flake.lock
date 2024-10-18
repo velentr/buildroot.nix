@@ -1,5 +1,22 @@
 {
   "nodes": {
+    "buildroot": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1725627684,
+        "narHash": "sha256-s0AaPMClTYVHUC4NVBQHhx8EKgSfl0f5kAIYr+WaLfQ=",
+        "owner": "buildroot.org",
+        "repo": "buildroot",
+        "rev": "769d71ae84c7a3d43ee92a1d126b2937713cc811",
+        "type": "gitlab"
+      },
+      "original": {
+        "owner": "buildroot.org",
+        "ref": "2024.08",
+        "repo": "buildroot",
+        "type": "gitlab"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1708566995,
@@ -18,6 +35,7 @@
     },
     "root": {
       "inputs": {
+        "buildroot": "buildroot",
         "nixpkgs": "nixpkgs",
         "treefmt-nix": "treefmt-nix"
       }

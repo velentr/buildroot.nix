@@ -9,8 +9,12 @@
   inputs.treefmt-nix.url = "github:numtide/treefmt-nix";
   inputs.treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
 
+  inputs.buildroot.url = "gitlab:buildroot.org/buildroot/2024.08";
+  inputs.buildroot.flake = false;
+
   outputs = {
     self,
+    buildroot,
     nixpkgs,
     treefmt-nix,
   }: let
@@ -21,6 +25,14 @@
       system:
         treefmt-nix.lib.evalModule pkgs.${system} ./treefmt.nix
     );
+    buildrootPackages = forAllSystems (system:
+      import ./default.nix {
+        name = "buildroot-checks";
+        pkgs = nixpkgs.legacyPackages.${system};
+        src = buildroot;
+        defconfig = "qemu_x86_64_defconfig";
+        lockfile = ./tests/buildroot.lock;
+      });
   in {
     lib.mkBuildroot = args: import ./default.nix args;
 
@@ -28,8 +40,14 @@
       system:
         treefmtEval.${system}.config.build.wrapper
     );
+
     checks = forAllSystems (system: {
       formatting = treefmtEval.${system}.config.build.check self;
+      test-buildroot = buildrootPackages.${system}.buildroot;
+    });
+
+    packages = forAllSystems (system: {
+      test-buildroot-lock = buildrootPackages.${system}.packageLockFile;
     });
   };
 }
