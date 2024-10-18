@@ -23,6 +23,7 @@
           bc
           cpio
           file
+          libxcrypt
           perl
           rsync
           unzip
