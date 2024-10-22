@@ -132,8 +132,8 @@ in rec {
             ln -s $lockedInput "$BR2_DL_DIR/$(basename $lockedInput)"
         done
 
-        ${makeFHSEnv}/bin/make-with-fhs-env ${envDeclarations}
-        ${makeFHSEnv}/bin/make-with-fhs-env ${envDeclarations} sdk
+        ${makeFHSEnv}/bin/make-with-fhs-env BR2_JLEVEL=$NIX_BUILD_CORES ${envDeclarations}
+        ${makeFHSEnv}/bin/make-with-fhs-env BR2_JLEVEL=$NIX_BUILD_CORES ${envDeclarations} sdk
       '';
 
       installPhase = ''
