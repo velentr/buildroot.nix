@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: 2024 Brian Kubisiak <brian@kubisiak.com>
+# SPDX-FileContributor: Rasmus Söderhielm <rasmus.soderhielm@gmail.com>
 #
 # SPDX-License-Identifier: MIT
 
@@ -45,11 +46,11 @@ def create_download_info(
     return result
 
 
-def index_download_checksums() -> T.Dict[str, DownloadInfo]:
+def index_download_checksums(dir: pathlib.Path) -> T.Dict[str, DownloadInfo]:
     result = {}
     hash_pattern = re.compile(r"(\w+)\s+([a-zA-Z0-9]+)\s+(\S+)\s*")
 
-    for hashfile in glob.iglob("**/*.hash", recursive=True):
+    for hashfile in dir.rglob("*.hash"):
         with open(hashfile, mode="r") as hashlines:
             for hashline in hashlines:
                 match = re.fullmatch(hash_pattern, hashline)
@@ -73,10 +74,17 @@ def main() -> None:
     parser.add_argument(
         "--output", "-o", type=pathlib.Path, help="Path to write the output lock file."
     )
+    parser.add_argument(
+        "--patch-dir",
+        type=pathlib.Path,
+        help="Optional path to search for hash files. Should have same the value as BR2_GLOBAL_PATCH_DIR.",
+    )
     args = parser.parse_args()
 
     package_info = json.loads(args.input.read_text())
-    checksums_index = index_download_checksums()
+    checksums_index = index_download_checksums(pathlib.Path("."))
+    if args.patch_dir:
+        checksums_index |= index_download_checksums(args.patch_dir)
     downloads_info = create_download_info(checksums_index, package_info)
     output = json.dumps(downloads_info, indent=2, sort_keys=True)
     if args.output:

@@ -1,15 +1,27 @@
 # SPDX-FileCopyrightText: 2024 Brian Kubisiak <brian@kubisiak.com>
+# SPDX-FileContributor: Rasmus Söderhielm <rasmus.soderhielm@gmail.com>
 #
 # SPDX-License-Identifier: MIT
 {
   name,
   pkgs ? import <nixpkgs> {},
   src,
+  externalSrc ? null,
+  patchSrc ? null,
   defconfig,
   lockfile,
   nativeBuildInputs ? [],
 }: let
   inherit (pkgs) stdenv;
+  externalDeclaration =
+    if externalSrc == null
+    then ""
+    else "BR2_EXTERNAL=${externalSrc}";
+  patchDeclaration =
+    if patchSrc == null
+    then ""
+    else "BR2_GLOBAL_PATCH_DIR=${patchSrc}";
+  envDeclarations = "${externalDeclaration} ${patchDeclaration}";
   # There are too many places that hardcode /bin or /usr/bin to patch them all
   # (some of them are in unpacked tarballs and aren't revealed until individual
   # packages are enabled). Instead, just build everything in a FHS
@@ -43,7 +55,7 @@
     '';
 
     configurePhase = ''
-      ${makeFHSEnv}/bin/make-with-fhs-env ${
+      ${makeFHSEnv}/bin/make-with-fhs-env ${envDeclarations} ${
         if builtins.isPath defconfig
         then "defconfig BR2_DEFCONFIG=${defconfig}"
         else defconfig
@@ -78,7 +90,7 @@ in rec {
       name = "${name}-packageinfo.json";
 
       buildPhase = ''
-        ${makeFHSEnv}/bin/make-with-fhs-env show-info > packageinfo.json
+        ${makeFHSEnv}/bin/make-with-fhs-env ${envDeclarations} show-info > packageinfo.json
       '';
 
       installPhase = ''
@@ -94,7 +106,13 @@ in rec {
 
     dontConfigure = true;
     buildPhase = ''
-      python3 ${./make-package-lock.py} --input ${packageInfo} --output $out
+      python3 ${./make-package-lock.py} \
+        ${
+        if patchSrc == null
+        then ""
+        else "--patch-dir ${patchSrc}"
+      } \
+        --input ${packageInfo} --output $out
     '';
     dontInstall = true;
   };
@@ -114,8 +132,8 @@ in rec {
             ln -s $lockedInput "$BR2_DL_DIR/$(basename $lockedInput)"
         done
 
-        ${makeFHSEnv}/bin/make-with-fhs-env
-        ${makeFHSEnv}/bin/make-with-fhs-env sdk
+        ${makeFHSEnv}/bin/make-with-fhs-env ${envDeclarations}
+        ${makeFHSEnv}/bin/make-with-fhs-env ${envDeclarations} sdk
       '';
 
       installPhase = ''
