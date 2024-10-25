@@ -25,6 +25,14 @@
       system:
         treefmt-nix.lib.evalModule pkgs.${system} ./treefmt.nix
     );
+    x86_64SdkPackages = forAllSystems (system:
+      import ./default.nix {
+        name = "buildroot-x86_64-sdk";
+        pkgs = nixpkgs.legacyPackages.${system};
+        src = buildroot;
+        defconfig = ./tests/configs/x86_64_defconfig;
+        lockfile = ./tests/buildroot-x86_64-sdk.lock;
+      });
     buildrootPackages = forAllSystems (system:
       import ./default.nix {
         name = "buildroot-checks";
@@ -44,10 +52,12 @@
     checks = forAllSystems (system: {
       formatting = treefmtEval.${system}.config.build.check self;
       test-buildroot = buildrootPackages.${system}.buildroot;
+      test-buildroot-x86_64-sdk = x86_64SdkPackages.${system}.buildroot;
     });
 
     packages = forAllSystems (system: {
       test-buildroot-lock = buildrootPackages.${system}.packageLockFile;
+      test-buildroot-x86_64-sdk-lock = x86_64SdkPackages.${system}.packageLockFile;
     });
   };
 }
