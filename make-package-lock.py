@@ -11,6 +11,7 @@ import glob
 import json
 import pathlib
 import re
+import sys
 import typing as T
 
 
@@ -38,6 +39,11 @@ def create_download_info(
                 for uri in download["uris"]
                 if is_http_download(uri)
             ]
+            if source not in checksums_index:
+                name = package["name"] + "-" + package["version"]
+                print(f"Missing source {name} in checksums")
+                print("URLs:", "\n".join(uris))
+                raise Exception(f"Missing checksum for source {name}")
             download_info = checksums_index[source]
             result[source] = dict(
                 uris=uris, algo=download_info.algo, checksum=download_info.checksum

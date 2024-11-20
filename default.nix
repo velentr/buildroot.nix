@@ -11,6 +11,7 @@
   defconfig,
   lockfile,
   nativeBuildInputs ? [],
+  extraSha256Hashes ? {},
 }: let
   inherit (pkgs) stdenv;
   externalDeclaration =
@@ -105,6 +106,12 @@ in rec {
     buildInputs = with pkgs; [python3];
 
     dontConfigure = true;
+    patchPhase = builtins.concatStringsSep "\n" (pkgs.lib.attrsets.mapAttrsToList (
+      source: hash: ''
+        echo "sha256  ${hash}  ${source}" >> package/added.hash
+      ''
+    ) extraSha256Hashes);
+
     buildPhase = ''
       python3 ${./make-package-lock.py} \
         ${
