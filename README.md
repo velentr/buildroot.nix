@@ -1,5 +1,6 @@
 <!--
 SPDX-FileCopyrightText: 2024 Brian Kubisiak <brian@kubisiak.com>
+SPDX-FileContributor: 2024 Litchi Pi <litchi.pi@proton.me>
 
 SPDX-License-Identifier: CC0-1.0
 -->
@@ -67,7 +68,7 @@ the lockfile to ensure that future builds are deterministic:
 
 ```bash
 nix build .#lockfile
-cp result buildroot.lock
+cp -L result buildroot.lock
 ```
 
 This step needs to be repeated as packages are added or updated to keep the
