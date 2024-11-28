@@ -107,10 +107,11 @@ in rec {
 
     dontConfigure = true;
     patchPhase = builtins.concatStringsSep "\n" (pkgs.lib.attrsets.mapAttrsToList (
-      source: hash: ''
-        echo "sha256  ${hash}  ${source}" >> package/added.hash
-      ''
-    ) extraSha256Hashes);
+        source: hash: ''
+          echo "sha256  ${hash}  ${source}" >> package/added.hash
+        ''
+      )
+      extraSha256Hashes);
 
     buildPhase = ''
       python3 ${./make-package-lock.py} \
