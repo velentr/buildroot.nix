@@ -51,6 +51,21 @@
 
     checks = forAllSystems (system: {
       formatting = treefmtEval.${system}.config.build.check self;
+      reuse-lint = let
+        pkgs = import nixpkgs {inherit system;};
+      in
+        pkgs.stdenvNoCC.mkDerivation {
+          name = "reuse-lint";
+          src = self;
+
+          dontBuild = true;
+          doCheck = true;
+
+          nativeBuildInputs = [pkgs.reuse];
+
+          checkPhase = "reuse lint";
+          installPhase = "mkdir $out";
+        };
       test-buildroot = buildrootPackages.${system}.buildroot;
       test-buildroot-x86_64-sdk = x86_64SdkPackages.${system}.buildroot;
     });
