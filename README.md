@@ -79,3 +79,26 @@ Once the lockfile is set up, you can build your buildroot images:
 ```bash
 nix build
 ```
+
+## reproducibility
+
+While nix gives you a hermetic build environment, you will not by default get a
+reproducible build. To check whether your build is deterministic:
+
+```bash
+nix build --rebuild --keep-failed
+```
+
+This will keep around both builds if the don't match and you can compare them
+with something like [diffoscope](https://diffoscope.org/) to find the
+differences.
+
+Here are a few buildroot options that can help make your build deterministic:
+
+- Set `BR2_REPRODUCIBLE=y`. This one is pretty obvious and I'm not totally sure
+  why it isn't the default (build time maybe?).
+
+- If you are generating an ext2/3/4 image, it will contain a randomly-generated
+  UUID. You can instead use a fixed UUID by passing in an option during
+  filesystem creation. Use `uuidgen` to generate a UUID, then set it with
+  `BR2_TARGET_ROOTFS_EXT2_MKFS_OPTIONS="-U <your uuid here>"`
