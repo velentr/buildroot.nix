@@ -3,16 +3,16 @@
     "buildroot": {
       "flake": false,
       "locked": {
-        "lastModified": 1725627684,
-        "narHash": "sha256-s0AaPMClTYVHUC4NVBQHhx8EKgSfl0f5kAIYr+WaLfQ=",
+        "lastModified": 1768938685,
+        "narHash": "sha256-9YPQ7vB0W+sd/uHoyn+NDwsq1kv39hglh+8u8bJaG20=",
         "owner": "buildroot.org",
         "repo": "buildroot",
-        "rev": "769d71ae84c7a3d43ee92a1d126b2937713cc811",
+        "rev": "1bf78b41855b907afd86327b1b96268c80ec3b44",
         "type": "gitlab"
       },
       "original": {
         "owner": "buildroot.org",
-        "ref": "2024.08",
+        "ref": "2025.11.1",
         "repo": "buildroot",
         "type": "gitlab"
       }

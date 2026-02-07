@@ -9,7 +9,7 @@
   inputs.treefmt-nix.url = "github:numtide/treefmt-nix";
   inputs.treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
 
-  inputs.buildroot.url = "gitlab:buildroot.org/buildroot/2024.08";
+  inputs.buildroot.url = "gitlab:buildroot.org/buildroot/2025.11.1";
   inputs.buildroot.flake = false;
 
   outputs = {
