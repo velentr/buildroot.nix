@@ -43,6 +43,7 @@
           util-linux
           wget # Not actually used, but still needs to be installed
           which
+          git
         ]
         ++ nativeBuildInputs;
     runScript = "make";
