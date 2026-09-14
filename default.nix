@@ -137,7 +137,7 @@ in rec {
         export BR2_DL_DIR=/build/source/downloads
         mkdir -p $BR2_DL_DIR
         for lockedInput in ${lockedPackageInputs}/*; do
-            ln -s $lockedInput "$BR2_DL_DIR/$(basename $lockedInput)"
+            ln -sf $lockedInput "$BR2_DL_DIR/$(basename $lockedInput)"
         done
 
         ${makeFHSEnv}/bin/make-with-fhs-env BR2_JLEVEL=$NIX_BUILD_CORES ${envDeclarations}
